@@ -61,7 +61,6 @@ if(PAHO_BUILD_SHARED)
 
     ## Add dependencies to the shared library
     target_link_libraries(paho-mqttpp3 PUBLIC
-      eclipse-paho-mqtt-c::paho-mqtt3as
       ${PAHO_MQTT_C_LIB}
       Threads::Threads
     )
