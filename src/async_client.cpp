@@ -397,7 +397,7 @@ void async_client::set_connected_handler(connection_handler cb)
 						&async_client::on_connected));
 }
 
-void async_client::set_connection_error_handler(connection_handler cb)
+void async_client::set_connection_error_handler(connection_error_handler cb)
 {
 	connErrHandler_ = cb;
 	check_ret(::MQTTAsync_setConnectionError(cli_, this,
