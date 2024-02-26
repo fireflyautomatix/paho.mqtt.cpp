@@ -143,6 +143,8 @@ private:
 	callback* userCallback_;
 	/** Connection handler */
 	connection_handler connHandler_;
+	/** Connection error handler */
+	connection_handler connErrHandler_;
 	/** Connection lost handler */
 	connection_handler connLostHandler_;
 	/** Disconnected handler */
@@ -164,6 +166,7 @@ private:
 
 	/** Callbacks from the C library */
 	static void on_connected(void* context, char* cause);
+	static void on_connection_error(void* context, char* cause);
 	static void on_connection_lost(void *context, char *cause);
 	static void on_disconnected(void* context, MQTTProperties* cprops,
 								MQTTReasonCodes reasonCode);
@@ -306,6 +309,11 @@ public:
 	 * @param cb Callback functor for when the connection is made.
 	 */
 	void set_connected_handler(connection_handler cb) /*override*/;
+	/**
+	 * Callback for when a connection fails.
+	 * @param cb Callback functor for when the connection is fails.
+	 */
+	void set_connection_error_handler(connection_handler cb);
 	/**
 	 * Callback for when a connection is lost.
 	 * @param cb Callback functor for when the connection is lost.

@@ -154,6 +154,18 @@ void async_client::on_connected(void* context, char* cause)
 	}
 }
 
+void async_client::on_connection_error(void* context, char* cause)
+{
+	if (context) {
+		async_client* cli = static_cast<async_client*>(context);
+		string cause_str = cause ? string(cause) : string();
+
+		auto& connErrHandler = cli->connErrHandler_;
+		if (connErrHandler)
+			connErrHandler(cause_str);
+	}
+}
+
 // Callback for when the connection is lost.
 // This is called from the MQTTAsync_connectionLost registered via 
 // MQTTAsync_setCallbacks().
@@ -371,6 +383,11 @@ void async_client::disable_callbacks()
 
 	if (rc != MQTTASYNC_SUCCESS)
 		throw exception(rc);
+
+	rc = MQTTAsync_setConnectionError(cli_, this, nullptr);
+
+	if (rc != MQTTASYNC_SUCCESS)
+		throw exception(rc);
 }
 
 void async_client::set_connected_handler(connection_handler cb)
@@ -378,6 +395,13 @@ void async_client::set_connected_handler(connection_handler cb)
 	connHandler_ = cb;
 	check_ret(::MQTTAsync_setConnected(cli_, this,
 						&async_client::on_connected));
+}
+
+void async_client::set_connection_error_handler(connection_handler cb)
+{
+	connErrHandler_ = cb;
+	check_ret(::MQTTAsync_setConnectionError(cli_, this,
+						&async_client::on_connection_error));
 }
 
 void async_client::set_connection_lost_handler(connection_handler cb)
@@ -894,6 +918,11 @@ void async_client::start_consuming()
 									&async_client::on_connection_lost,
 									&async_client::on_message_arrived,
 									nullptr);
+
+	if (rc != MQTTASYNC_SUCCESS)
+		throw exception(rc);
+
+	rc = MQTTAsync_setConnectionError(cli_, this, &async_client::on_connection_error);
 
 	if (rc != MQTTASYNC_SUCCESS)
 		throw exception(rc);
