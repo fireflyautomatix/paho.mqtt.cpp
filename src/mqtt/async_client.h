@@ -116,6 +116,8 @@ public:
 	using message_handler = std::function<void(const_message_ptr)>;
 	/** Handler type for when a connecion is made or lost */
 	using connection_handler = std::function<void(const string& cause)>;
+	/** Handler type for when a connecion fails */
+	using connection_error_handler = std::function<void(int code, const string& cause)>;
 	/** Handler type for when a disconnect packet is received */
 	using disconnected_handler = std::function<void(const properties&, ReasonCode)>;
 	/** Handler for updaing connection data before an auto-reconnect. */
@@ -144,7 +146,7 @@ private:
 	/** Connection handler */
 	connection_handler connHandler_;
 	/** Connection error handler */
-	connection_handler connErrHandler_;
+	connection_error_handler connErrHandler_;
 	/** Connection lost handler */
 	connection_handler connLostHandler_;
 	/** Disconnected handler */
@@ -166,7 +168,7 @@ private:
 
 	/** Callbacks from the C library */
 	static void on_connected(void* context, char* cause);
-	static void on_connection_error(void* context, char* cause);
+	static void on_connection_error(void* context, int code, const char* cause);
 	static void on_connection_lost(void *context, char *cause);
 	static void on_disconnected(void* context, MQTTProperties* cprops,
 								MQTTReasonCodes reasonCode);
@@ -313,7 +315,7 @@ public:
 	 * Callback for when a connection fails.
 	 * @param cb Callback functor for when the connection is fails.
 	 */
-	void set_connection_error_handler(connection_handler cb);
+	void set_connection_error_handler(connection_error_handler cb);
 	/**
 	 * Callback for when a connection is lost.
 	 * @param cb Callback functor for when the connection is lost.

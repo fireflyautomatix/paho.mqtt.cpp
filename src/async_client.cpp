@@ -154,7 +154,7 @@ void async_client::on_connected(void* context, char* cause)
 	}
 }
 
-void async_client::on_connection_error(void* context, char* cause)
+void async_client::on_connection_error(void* context, int code, const char* cause)
 {
 	if (context) {
 		async_client* cli = static_cast<async_client*>(context);
@@ -162,7 +162,7 @@ void async_client::on_connection_error(void* context, char* cause)
 
 		auto& connErrHandler = cli->connErrHandler_;
 		if (connErrHandler)
-			connErrHandler(cause_str);
+			connErrHandler(code, cause_str);
 	}
 }
 
